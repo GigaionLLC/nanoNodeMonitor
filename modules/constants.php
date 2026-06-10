@@ -1,7 +1,7 @@
 <?php
 
 // the project version
-define('PROJECT_VERSION', '1.8.0');
+define('PROJECT_VERSION', '1.9.0');
 
 // project URL
 define('PROJECT_URL', 'https://github.com/gigaion/nanoNodeMonitor');
