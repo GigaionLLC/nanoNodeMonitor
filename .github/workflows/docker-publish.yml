@@ -19,18 +19,32 @@ permissions:
 jobs:
   docker:
     runs-on: ubuntu-latest
+    env:
+      # Docker Hub is the legacy/secondary registry and entirely optional:
+      # without the secrets the workflow publishes to GHCR only and still
+      # succeeds. Adding DOCKERHUB_USERNAME + DOCKERHUB_TOKEN to the repo
+      # secrets enables the Docker Hub push, no workflow change needed.
+      DOCKERHUB_ENABLED: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+      - name: Select target registries
+        id: images
+        run: |
+          images="ghcr.io/gigaionllc/nanonodemonitor"
+          if [ "$DOCKERHUB_ENABLED" = "true" ]; then
+            images="${images}"$'\n'"gigaion/nanonodemonitor"
+          fi
+          echo "list<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$images" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
           # GitHub Container Registry is the primary image location;
-          # Docker Hub is kept as the legacy/secondary location
-          images: |
-            ghcr.io/gigaionllc/nanonodemonitor
-            gigaion/nanonodemonitor
+          # Docker Hub is included only when its secrets are configured
+          images: ${{ steps.images.outputs.list }}
           # generate Docker tags based on the following events/attributes
           tags: |
             type=schedule
@@ -52,7 +66,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Login to DockerHub
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && env.DOCKERHUB_ENABLED == 'true'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
