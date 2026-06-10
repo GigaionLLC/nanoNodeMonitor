@@ -32,6 +32,55 @@ if (!file_exists($configPath)) {
 $configPath = realpath($configPath);
 
 // ---------------------------------------------------------------------------
+// Inspect the config source BEFORE executing it. Configs that contain custom
+// PHP logic (host switching on $_SERVER, guards that die(), conditionals)
+// must not be flattened: rewriting would bake in one branch and could even
+// abort this script mid-include. Detect those token-wise and skip.
+// ---------------------------------------------------------------------------
+
+function nnm_config_is_scripted($source, &$reason)
+{
+    $flagged = array(
+        T_IF => 'if', T_ELSEIF => 'elseif', T_ELSE => 'else', T_SWITCH => 'switch',
+        T_FOR => 'for', T_FOREACH => 'foreach', T_WHILE => 'while', T_DO => 'do',
+        T_FUNCTION => 'function', T_EXIT => 'exit/die', T_ECHO => 'echo',
+        T_PRINT => 'print', T_REQUIRE => 'require', T_REQUIRE_ONCE => 'require_once',
+        T_INCLUDE => 'include', T_INCLUDE_ONCE => 'include_once',
+    );
+    $superglobals = array('$_SERVER', '$_GET', '$_POST', '$_REQUEST', '$_COOKIE', '$_ENV', '$GLOBALS');
+
+    foreach (token_get_all($source) as $token) {
+        if (!is_array($token)) {
+            continue;
+        }
+        if (isset($flagged[$token[0]])) {
+            $reason = $flagged[$token[0]];
+            return true;
+        }
+        if ($token[0] === T_VARIABLE && in_array($token[1], $superglobals, true)) {
+            $reason = $token[1];
+            return true;
+        }
+    }
+    return false;
+}
+
+$source = file_get_contents($configPath);
+
+// version marker readable without executing the file
+if (preg_match('/\$configVersion\s*=\s*(\d+)\s*;/', $source, $m) && (int) $m[1] >= CONFIG_VERSION) {
+    exit("config.php is already at schema version {$m[1]} - nothing to do.\n");
+}
+
+$reason = '';
+if (nnm_config_is_scripted($source, $reason)) {
+    echo "config.php contains custom PHP logic ($reason) - automatic migration skipped.\n";
+    echo "Review config.sample.php for current options and update config.php manually,\n";
+    echo "then set \$configVersion = " . CONFIG_VERSION . "; to silence this notice.\n";
+    exit(0);
+}
+
+// ---------------------------------------------------------------------------
 // Load defaults and the user's config in an isolated scope, mirroring the
 // include order of modules/includes.php.
 // ---------------------------------------------------------------------------

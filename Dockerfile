@@ -11,6 +11,10 @@ LABEL org.opencontainers.image.source="https://github.com/GigaionLLC/nanoNodeMon
       org.opencontainers.image.description="Server-side PHP monitor for Nano and Banano nodes" \
       org.opencontainers.image.licenses="GPL-3.0-only"
 
+# silence AH00558 startup notice
+RUN echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf \
+    && a2enconf servername
+
 # copy all contents to public html
 COPY . /var/www/html
 
