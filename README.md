@@ -4,6 +4,10 @@
 
 Nano Node Monitor is a server-side PHP-based monitor for Nano and Banano nodes. It connects to a running node via RPC and displays it's status on a simple webpage. Being server-side, it does not expose the RPC interface of the Nano node to the public.
 
+This is the GigaionLLC fork of the archived [NanoTools/nanoNodeMonitor](https://github.com/NanoTools/nanoNodeMonitor), modernized for PHP 8.1–8.5 with security hardening of the cache layer and template output.
+
+**AI-enhanced project.** Nano Node Monitor is developed, modernized, and maintained with extensive use of AI coding agents. The PHP 8.5 modernization, the security hardening, and the documentation were all produced and verified with AI assistance. Agent and contributor guidance follows the [AGENT.md](AGENT.md) standard.
+
 |Nano Light|Nano Dark|Banano Light|Banano Dark|
 |-|-|-|-|
 |![Light](.github/theme-preview/nano-light.png)|![Dark](.github/theme-preview/nano-dark.png)|![Banano](.github/theme-preview/banano-light.png)|![Banano Dark](.github/theme-preview/banano-dark.png)|
