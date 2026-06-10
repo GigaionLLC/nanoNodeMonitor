@@ -103,7 +103,8 @@ https://docs.nano.org/running-a-node/voting-as-a-representative/#step-2-setup-re
 
 ### Upgrading an existing config
 
-When upgrading from an older release, migrate your `config.php` to the current schema with:
+Docker containers migrate the config automatically on start. For manual
+installations, migrate your `config.php` to the current schema with:
 
     php scripts/migrate-config.php
 

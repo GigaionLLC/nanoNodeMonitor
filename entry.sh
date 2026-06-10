@@ -15,6 +15,10 @@ fi
 # create config symlink
 ln -s $monitordir/config.php /var/www/html/modules/config.php
 
+# migrate the config to the current schema if needed (idempotent; backs up
+# the old file next to it on the volume). Never blocks the web server.
+php /var/www/html/scripts/migrate-config.php || echo "WARNING: config migration failed, starting with existing config."
+
 # change folder rights so www-data can read
 chmod 755 /opt
 

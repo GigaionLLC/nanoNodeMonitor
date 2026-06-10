@@ -27,6 +27,10 @@ if (!file_exists($configPath)) {
          "Copy config.sample.php to config.php first.\n");
 }
 
+// resolve symlinks (Docker links modules/config.php to the /opt volume) so
+// the rewritten config and its backup both land on the persistent target
+$configPath = realpath($configPath);
+
 // ---------------------------------------------------------------------------
 // Load defaults and the user's config in an isolated scope, mirroring the
 // include order of modules/includes.php.
