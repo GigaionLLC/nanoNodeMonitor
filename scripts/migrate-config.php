@@ -128,6 +128,16 @@ $migrations = array(
         }
         return $cfg;
     },
+
+    // v1 -> v2
+    2 => function (array $cfg, array &$notes) {
+        // meltingice explorer is defunct -> blocklattice
+        if (($cfg['blockExplorer'] ?? '') === 'meltingice') {
+            $notes[] = "blockExplorer 'meltingice' is defunct -> 'blocklattice'";
+            $cfg['blockExplorer'] = 'blocklattice';
+        }
+        return $cfg;
+    },
 );
 
 $notes = array();

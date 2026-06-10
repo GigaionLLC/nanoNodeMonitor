@@ -1,6 +1,6 @@
 # Nano Node Monitor
 
-![GitHub release](https://img.shields.io/github/release/gigaion/nanoNodeMonitor.svg?style=flat-square) [![StyleCI](https://styleci.io/repos/118352667/shield?branch=master)](https://styleci.io/repos/118352667) [![Docker Pulls](https://img.shields.io/docker/pulls/gigaion/nanonodemonitor.svg?style=flat-square)](https://hub.docker.com/r/gigaion/nanonodemonitor/)
+![GitHub release](https://img.shields.io/github/release/GigaionLLC/nanoNodeMonitor.svg?style=flat-square) [![StyleCI](https://styleci.io/repos/118352667/shield?branch=master)](https://styleci.io/repos/118352667) [![Docker Pulls](https://img.shields.io/docker/pulls/gigaion/nanonodemonitor.svg?style=flat-square)](https://hub.docker.com/r/gigaion/nanonodemonitor/)
 
 Nano Node Monitor is a server-side PHP-based monitor for Nano and Banano nodes. It connects to a running node via RPC and displays it's status on a simple webpage. Being server-side, it does not expose the RPC interface of the Nano node to the public.
 
@@ -81,7 +81,7 @@ services:
 
 In your empty webserver directory, e.g. `/var/www/html`, execute:
 
-    git clone https://github.com/gigaion/nanoNodeMonitor .
+    git clone https://github.com/GigaionLLC/nanoNodeMonitor .
 
 If you want it to run a subdirectory remove the `.` at the end.
 
@@ -130,7 +130,7 @@ $nanoNodeRPCPort = '7076';
 
 ## Creating a Theme
 
-If you're interested in creating your own theme in addition to the official Light,  Dark, and Banano themes, we've made it very simple for you to do so. Check out the [Wiki](https://github.com/gigaion/nanoNodeMonitor/wiki/Create-a-theme) for more info.
+If you're interested in creating your own theme in addition to the official Light,  Dark, and Banano themes, we've made it very simple for you to do so. Check out the [Wiki](https://github.com/GigaionLLC/nanoNodeMonitor/wiki/Create-a-theme) for more info.
 
 ## Support
 

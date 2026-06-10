@@ -14,7 +14,11 @@ if ($currency == 'banano') {
   <div class="row">
     <div class="col-lg-8 col-md-6 col-sm-6">
       <a href="<?php echo $coinURL; ?>" target="_blank" rel="noopener">
+<?php if ($currency == 'nano' || $currency == 'nano-beta') { ?>
+        <img src="static/img/badge-blue.png" width="220" alt="Nano Logo"/>
+<?php } else { ?>
         <img src="static/img/nano-full-<?php echo e($themeChoice); ?>.svg" width="220" alt="Logo"/>
+<?php } ?>
       </a>
       <p class="lead mt-2"><?php echo currencyName($currency); ?> Node Monitor</p>
       <p><?php echo $welcomeMsg; ?></p>

@@ -5,13 +5,13 @@ define('PROJECT_VERSION', '1.9.1');
 
 // current config.php schema version; bump when config migration rules
 // are added to scripts/migrate-config.php
-define('CONFIG_VERSION', 1);
+define('CONFIG_VERSION', 2);
 
 // project URL
-define('PROJECT_URL', 'https://github.com/gigaion/nanoNodeMonitor');
+define('PROJECT_URL', 'https://github.com/GigaionLLC/nanoNodeMonitor');
 
 // URL to get version of latest release from github
-define('GITHUB_LATEST_API_URL', 'https://api.github.com/repos/gigaion/nanoNodeMonitor/releases/latest');
+define('GITHUB_LATEST_API_URL', 'https://api.github.com/repos/GigaionLLC/nanoNodeMonitor/releases/latest');
 
 // nano rep account for Nano Node Monitor 
 define ('NODEMON_REP_ACCOUNT', 'nano_11pb5aa6uirs9hoqsg4swnzyehoiqowj94kdpthwkhwufmtd6a11xx35iron');
