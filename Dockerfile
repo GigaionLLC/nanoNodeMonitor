@@ -1,3 +1,7 @@
+# check=skip=CopyIgnoredFile
+# (directive above must stay on line 1: COPY . necessarily references
+# paths excluded by .dockerignore, which is intended; skip that lint)
+
 # apache with php base image
 FROM php:8.5-apache
 
