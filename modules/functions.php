@@ -45,10 +45,12 @@ function rawToCurrency($raw, $currency)
   }
 }
 
-// get system load average
+// get system load average (15 min); 0 when unavailable (e.g. Windows)
 function getSystemLoadAvg()
 {
-  return sys_getloadavg()[2];
+  if (!function_exists('sys_getloadavg')) return 0;
+  $load = sys_getloadavg();
+  return ($load !== false) ? $load[2] : 0;
 }
 
 // get system memory info
@@ -67,26 +69,30 @@ function getSystemMemInfo()
 // get system total memory in MB
 function getSystemTotalMem()
 {
-    return intval((int)getSystemMemInfo()["MemTotal"] / 1024);
+    $meminfo = getSystemMemInfo();
+    if (!isset($meminfo["MemTotal"])) return 0;
+    return intval((int)$meminfo["MemTotal"] / 1024);
 }
 
 // get system used memory in MB
 function getSystemUsedMem()
 {
     $meminfo = getSystemMemInfo();
+    if (!isset($meminfo["MemTotal"], $meminfo["MemAvailable"])) return 0;
     return intval(((int)$meminfo["MemTotal"] - (int)$meminfo["MemAvailable"]) / 1024);
 }
 
 // get system uptime array with secs, mins, hours and days
+// returns zeroed values when /proc/uptime is unavailable (e.g. non-Linux)
 function getSystemUptime()
 {
-    if (!file_exists('/proc/uptime')) return NULL;
+    $array = array("secs" => 0, "mins" => 0, "hours" => 0, "days" => 0);
+    if (!is_readable('/proc/uptime')) return $array;
     $str   = file_get_contents('/proc/uptime');
     $num   = intval($str);
-    $array = array();
     $array["secs"] = $num % 60;
     $num = (int)($num / 60);
-    $array["mins"] = $mins  = $num % 60;
+    $array["mins"] = $num % 60;
     $num = (int)($num / 60);
     $array["hours"] = $num % 24;
     $num = (int)($num / 24);
@@ -132,8 +138,6 @@ function getLatestReleaseVersion()
   $response = curl_exec($curl);
   $err = curl_error($curl);
 
-  curl_close($curl);
-
   if ($err) {
     return "API error";
   }
@@ -142,7 +146,7 @@ function getLatestReleaseVersion()
   $response = json_decode($response);
 
   // tag string
-  if (property_exists($response, "tag_name"))
+  if (is_object($response) && property_exists($response, "tag_name"))
   {
       $tagString = $response->tag_name;
 
@@ -199,8 +203,6 @@ function getLatestNodeReleaseVersion()
   $response = curl_exec($curl);
   $err = curl_error($curl);
 
-  curl_close($curl);
-
   if ($err) {
     return "API error";
   }
@@ -209,7 +211,7 @@ function getLatestNodeReleaseVersion()
   $response = json_decode($response);
 
   // tag string
-  if (property_exists($response, "tag_name"))
+  if (is_object($response) && property_exists($response, "tag_name"))
   {
     return substr($response->tag_name, 1); //delete the V at the beginning
   }
@@ -217,12 +219,11 @@ function getLatestNodeReleaseVersion()
   return '';
 }
 
-// gets the number from the version string
+// gets the number from the version string, e.g. "Nano V21.2" -> "21.2"
 function formatVersion($rawversion){
-  $formattedVersionArray = explode(' ', $rawversion);
-  $formattedVersion = ltrim($formattedVersionArray[1], 'V');
+  $formattedVersionArray = explode(' ', (string) $rawversion);
 
-  return $formattedVersion;
+  return ltrim(end($formattedVersionArray), 'Vv');
 }
 
 // get a string with information about the
@@ -237,7 +238,7 @@ function isNewNodeVersionAvailable($currentVersion, $latestVersion, $currency)
 
   $currentVersion = $currentVersion;
 
-  if ( version_compare($currentVersion, $latestVersion) < 0 ){
+  if ( version_compare($currentVersion, (string) $latestVersion) < 0 ){
     return $latestVersion;
   } else {
     return false;
@@ -276,8 +277,6 @@ function getNodeUptime($apiKey, $uptimeRatio = 30)
   $err = curl_error($curl);
   $errCode = -1;
 
-  curl_close($curl);
-
   if ($err) {
     return $errCode;
   }
@@ -289,17 +288,19 @@ function getNodeUptime($apiKey, $uptimeRatio = 30)
     return $errCode;
   }
 
-  if (! array_key_exists('monitors', $response)) {
+  // array_key_exists() on objects throws a TypeError since PHP 8.0
+  if (!is_object($response) || empty($response->monitors)) {
     return $errCode;
   }
 
-  return (float)$response->monitors[0]->custom_uptime_ratio;
+  return (float)($response->monitors[0]->custom_uptime_ratio ?? $errCode);
 }
 
 // truncate long Nano addresses to display the first and
 // last characters with ellipsis in the center
 function truncateAddress($addr)
 {
+  $addr = (string) $addr;
   $totalNumChar = NANO_ADDR_NUM_CHAR;
   $numEllipsis  = 3; // ...
   $numPrefix    = 4; // xrb_
@@ -364,7 +365,7 @@ function getNodeLocation($nodeLocationByUser, $nodeNinja) {
         // location set by user
         $location = $nodeLocationByUser;
     }
-    elseif ($nodeNinja && array_key_exists('location', $nodeNinja)) {
+    elseif ($nodeNinja && is_object($nodeNinja) && property_exists($nodeNinja, 'location')) {
 
         // location taken from ninja's location object
         $locationObj = $nodeNinja->{'location'};
@@ -451,12 +452,12 @@ function currencySymbol($currency)
 
 // sort array by 'duration' sub value
 function cmpByDuration($a, $b) {
-  return $a->{'duration'} - $b->{'duration'};
+  return $a->{'duration'} <=> $b->{'duration'};
 }
 
 // sort array by 'time' sub value (largest first)
 function cmpByTime($a, $b) {
-  return $b->{'time'} - $a->{'time'};
+  return $b->{'time'} <=> $a->{'time'};
 }
 
 // get a percentile from a sorted json structure which contains sub element values with the name 'duration'
@@ -467,10 +468,11 @@ function getConfirmationsDurationPercentile($percentile, $array) {
     }
     $index = ($percentile/100) * count($array);
     if (floor($index) == $index) {
+         $index  = (int) $index;
          $result = ($array[$index-1]->{'duration'} + $array[$index]->{'duration'})/2;
     }
     else {
-        $result = $array[floor($index)]->{'duration'};
+        $result = $array[(int) floor($index)]->{'duration'};
     }
     return (int) $result;
 }

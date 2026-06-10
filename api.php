@@ -40,10 +40,10 @@ $data = $cache->fetch($apiName, function () use (
 
     // -- Get Version String from nano node and node monitor
     $version = getVersion($ch);
-    $data->version = $version->{'node_vendor'};
-    $data->store_version = (int) $version->{'store_version'} ?: 0;
-    $data->protocol_version = (int) $version->{'protocol_version'} ?: 0;
-    $data->store_vendor = (string) $version->{'store_vendor'} ?: '';
+    $data->version = $version->{'node_vendor'} ?? '';
+    $data->store_version = (int) ($version->{'store_version'} ?? 0);
+    $data->protocol_version = (int) ($version->{'protocol_version'} ?? 0);
+    $data->store_vendor = (string) ($version->{'store_vendor'} ?? '');
 
     // Cache the github query for latest node version
     global $nodeVersionCache;
@@ -65,20 +65,20 @@ $data = $cache->fetch($apiName, function () use (
 
     // -- Get get current block from nano_node
     $rpcBlockCount = getBlockCount($ch);
-    $data->currentBlock = (int) $rpcBlockCount->{'count'};
-    $data->uncheckedBlocks = (int) $rpcBlockCount->{'unchecked'};
-    $data->cementedBlocks = (int) $rpcBlockCount->{'cemented'} ?: 0;
+    $data->currentBlock = (int) ($rpcBlockCount->{'count'} ?? 0);
+    $data->uncheckedBlocks = (int) ($rpcBlockCount->{'unchecked'} ?? 0);
+    $data->cementedBlocks = (int) ($rpcBlockCount->{'cemented'} ?? 0);
 
     // -- Get number of peers from nano_node
     $rpcPeers = getPeers($ch);
-    $peers = (array) $rpcPeers->{'peers'};
+    $peers = (array) ($rpcPeers->{'peers'} ?? []);
     $data->numPeers = count($peers);
 
     // -- Get confirmation info from nano_node. Average time, blocks used, time span  and percentiles
     // -- over last X min (set by CONFIRMATION_TIME_LIMIT) or max 2048 blocks which is a node limitation
     //$timeStampBefore = microtime(true); // measure execution time
     $rpcConfHistory = getConfirmationHistory($ch);
-    $confirmations = $rpcConfHistory->{'confirmations'}; // a list of last X confirmations {hash,duration,time,tally}
+    $confirmations = $rpcConfHistory->{'confirmations'} ?? []; // a list of last X confirmations {hash,duration,time,tally}
     //$confAverage = $rpcConfHistory->{'confirmation_stats'}->{'average'}; // average time [ms] of all confirmations
     //$confCount = $rpcConfHistory->{'confirmation_stats'}->{'count'}; // number of confirmations retrieved from the node
 
@@ -123,11 +123,12 @@ $data = $cache->fetch($apiName, function () use (
     }
 
     // -- Get node account balance from nano_node
+    // raw amounts exceed PHP_INT_MAX (1 nano = 10^30 raw), keep them as strings
     $rpcNodeAccountBalance = getAccountBalance($ch, $nanoNodeAccount);
     $data->accBalanceMnano = rawToCurrency($rpcNodeAccountBalance->{'balance'} ?? 0, $currency);
-    $data->accBalanceRaw = (int) ($rpcNodeAccountBalance->{'balance'} ?? 0);
+    $data->accBalanceRaw = (string) ($rpcNodeAccountBalance->{'balance'} ?? '0');
     $data->accPendingMnano = rawToCurrency($rpcNodeAccountBalance->{'pending'} ?? 0, $currency);
-    $data->accPendingRaw = (int) ($rpcNodeAccountBalance->{'pending'} ?? 0);
+    $data->accPendingRaw = (string) ($rpcNodeAccountBalance->{'pending'} ?? '0');
 
     // -- Get representative info for current node from nano_node
     $rpcNodeRepInfo = getRepresentativeInfo($ch, $nanoNodeAccount);
@@ -149,7 +150,7 @@ $data = $cache->fetch($apiName, function () use (
     $data->totalMem = getSystemTotalMem();
     //$data->uname = getUname();
     $data->nanoNodeName = $nanoNodeName;
-    $data->nodeUptimeStartup = (int) getUptime($ch)->{'seconds'} ?: 0;
+    $data->nodeUptimeStartup = (int) (getUptime($ch)->{'seconds'} ?? 0);
 
     // get the node uptime (if we have a api key)
     if ($uptimerobotApiKey) {
@@ -178,14 +179,11 @@ $data = $cache->fetch($apiName, function () use (
     $data->telemetry = getTelemetry($ch);
 
     // sync status in %
-    if ($data->telemetry->block_count) {
+    if (!empty($data->telemetry->block_count)) {
         $data->blockSync = getSyncStatus($data->currentBlock, $data->telemetry->block_count);
     } else {
         $data->blockSync = null;
     }
-
-    // close curl handle
-    curl_close($ch);
 
     // calculate total script execution time
     $data->apiProcTime = round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000);

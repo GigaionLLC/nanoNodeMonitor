@@ -61,7 +61,7 @@ services:
 ### Prerequisites
 
 - Running Nano Node with RPC enabled ([Tutorial](https://docs.nano.org/running-a-node/node-setup/))
-- Webserver with PHP 8.0
+- Webserver with PHP 8.1 – 8.5
 - PHP-Curl Module
 
     `sudo apt-get install php-curl`
