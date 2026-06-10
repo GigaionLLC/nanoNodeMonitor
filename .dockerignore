@@ -1,2 +1,5 @@
 .*
 *.md
+build.txt
+docker-compose.dev.yml
+modules/config.php

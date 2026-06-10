@@ -1,1 +1,6 @@
-docker build -t gigaion/nanonodemonitor .
+# Build and tag for both registries (GHCR preferred, Docker Hub legacy)
+docker build -t ghcr.io/gigaionllc/nanonodemonitor -t gigaion/nanonodemonitor .
+
+# Push (requires docker login ghcr.io with a GitHub PAT that has write:packages)
+docker push ghcr.io/gigaionllc/nanonodemonitor
+docker push gigaion/nanonodemonitor

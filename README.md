@@ -14,7 +14,13 @@ This is the GigaionLLC fork of the archived [NanoTools/nanoNodeMonitor](https://
 
 ## Docker Installation
 
-### Pulling Docker image
+### Pulling the image
+
+Images are published to the **GitHub Container Registry (preferred)**:
+
+    sudo docker pull ghcr.io/gigaionllc/nanonodemonitor
+
+They are also pushed to Docker Hub as a secondary, legacy location:
 
     sudo docker pull gigaion/nanonodemonitor
 
@@ -22,7 +28,7 @@ This is the GigaionLLC fork of the archived [NanoTools/nanoNodeMonitor](https://
 
 #### Standalone
 
-    sudo docker run -d -p 80:80 -v ~:/opt --restart=unless-stopped gigaion/nanonodemonitor
+    sudo docker run -d -p 80:80 -v ~:/opt --restart=unless-stopped ghcr.io/gigaionllc/nanonodemonitor
 
 This will create a directory called _nanoNodeMonitor_ inside your home directory with the _config.php_ inside it.
 Edit it according to your needs and you're good to go!
@@ -37,7 +43,7 @@ Edit it according to your needs and you're good to go!
 version: '3'
 services:
   monitor:
-    image: "gigaion/nanonodemonitor:TAG"
+    image: "ghcr.io/gigaionllc/nanonodemonitor:TAG"
     restart: "unless-stopped"
     ports:
      - "80:80"
