@@ -13,6 +13,9 @@
         <link rel="stylesheet" href="static/css/fontawesome-all.min.css?v=<?php echo PROJECT_VERSION; ?>" media="screen">
         <link rel="stylesheet" href="static/css/main.css?v=<?php echo PROJECT_VERSION; ?>" media="screen">
         <link rel="stylesheet" href="static/themes/<?php echo e($themeChoice); ?>/css/theme.css?v=<?php echo PROJECT_VERSION; ?>" media="screen">
+<?php if ($currency == 'nano' || $currency == 'nano-beta') { ?>
+        <link rel="icon" type="image/svg+xml" href="static/img/badge-blue--outlined.svg">
+<?php } ?>
         <link rel="shortcut icon" href="static/img/favicon/<?php echo currencyName($currency); ?>/favicon.ico">
         <link rel="icon" sizes="16x16 32x32 64x64" href="static/img/favicon/<?php echo currencyName($currency); ?>/favicon.ico">
         <link rel="icon" type="image/png" sizes="196x196" href="static/img/favicon/<?php echo currencyName($currency); ?>/favicon-192.png">

@@ -1,7 +1,11 @@
 <div class="navbar navbar-expand-lg n-navbar-theme fixed-top">
   <div class="container">
     <a href="index.php" class="navbar-brand">
+<?php if ($currency == 'nano' || $currency == 'nano-beta') { ?>
+      <img src="static/img/badge-blue--outlined.svg" alt="Nano Logo" style="height: 1em;"/>
+<?php } else { ?>
       <img src="static/img/nano-mark-<?php echo e($themeChoice); ?>.svg" alt="Nano Logo" style="height: 1em;"/>
+<?php } ?>
       <span class="n-logo-theme"><?php echo currencyName($currency); ?> Node Monitor</span>
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
