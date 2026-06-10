@@ -1,5 +1,11 @@
 <?php
 
+// escape a value for safe output in HTML
+function e($value)
+{
+  return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+}
+
 // print error and die
 function myError($errorMsg)
 {
@@ -105,6 +111,7 @@ function returnJson($data)
 {
   header('Content-Type: application/json; charset=utf-8');
   header('Access-Control-Allow-Origin: *');
+  header('X-Content-Type-Options: nosniff');
   echo json_encode($data);
 }
 

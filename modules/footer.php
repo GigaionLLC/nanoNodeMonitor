@@ -56,13 +56,13 @@
   if (strlen($googleAnalyticsId))
   {
 ?>
-<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo $googleAnalyticsId; ?>"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo e(rawurlencode($googleAnalyticsId)); ?>"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', '<?php echo $googleAnalyticsId; ?>');
+  gtag('config', <?php echo json_encode($googleAnalyticsId); ?>);
 </script>
 <?php
   }

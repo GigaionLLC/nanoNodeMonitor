@@ -18,9 +18,10 @@ class FileCache extends Cache
 
     /**
      * The root cache directory.
+     * Defaults to a dedicated directory inside the system temp dir.
      * @var string
      */
-    private $cache_dir = '/tmp/cache';
+    private $cache_dir;
 
     /**
      * The cache time in seconds.
@@ -34,6 +35,8 @@ class FileCache extends Cache
      */
     public function __construct(array $options = array())
     {
+        $this->cache_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'nanoNodeMonitor-cache';
+
         $available_options = array('cache_dir', 'ttl');
         foreach ($available_options as $name) {
             if (isset($options[$name])) {
@@ -44,6 +47,10 @@ class FileCache extends Cache
 
     /**
      * Fetches an entry from the cache.
+     *
+     * Entries are stored as JSON. Never unserialize() cache files: the cache
+     * directory may be guessable on shared hosts, and unserialize() of
+     * attacker-supplied data allows PHP object injection.
      *
      * @param string $id
      */
@@ -63,8 +70,7 @@ class FileCache extends Cache
             @unlink($file_name);
             return NULL;
         }
-        $serialized = join('', $lines);
-        $data       = unserialize($serialized);
+        $data = json_decode(join('', $lines));
         return $data;
     }
 
@@ -93,14 +99,14 @@ class FileCache extends Cache
     {
         $dir = $this->getDirectory($id);
         if (!is_dir($dir)) {
-            if (!mkdir($dir, 0755, true)) {
+            if (!@mkdir($dir, 0700, true) && !is_dir($dir)) {
                 return false;
             }
         }
-        $file_name  = $this->getFileName($id);
-        $lifetime   = time() + $this->ttl;
-        $serialized = serialize($data);
-        $result     = file_put_contents($file_name, $lifetime . PHP_EOL . $serialized);
+        $file_name = $this->getFileName($id);
+        $lifetime  = time() + $this->ttl;
+        $encoded   = json_encode($data);
+        $result    = file_put_contents($file_name, $lifetime . PHP_EOL . $encoded, LOCK_EX);
         if ($result === false) {
             return false;
         }

@@ -14,15 +14,15 @@ if ($currency == 'banano') {
   <div class="row">
     <div class="col-lg-8 col-md-6 col-sm-6">
       <a href="<?php echo $coinURL; ?>" target="_blank" rel="noopener">
-        <img src="static/img/nano-full-<?php echo $themeChoice; ?>.svg" width="220" alt="Logo"/>
+        <img src="static/img/nano-full-<?php echo e($themeChoice); ?>.svg" width="220" alt="Logo"/>
       </a>
       <p class="lead mt-2"><?php echo currencyName($currency); ?> Node Monitor</p>
       <p><?php echo $welcomeMsg; ?></p>
 
       <div class="btn-group mb-3">
       <?php foreach ($socials as $socialkey => $socialvalue) { ?>
-      <a href="<?php echo $socialvalue; ?>" target="_blank" rel="noopener" class="btn btn-secondary" aria-label="Social Media">
-        <i class="fab fa-<?php echo $socialkey; ?>"></i>
+      <a href="<?php echo e($socialvalue); ?>" target="_blank" rel="noopener" class="btn btn-secondary" aria-label="Social Media">
+        <i class="fab fa-<?php echo e($socialkey); ?>"></i>
       </a>
       <?php } ?>
       </div>
