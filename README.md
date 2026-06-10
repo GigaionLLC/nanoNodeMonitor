@@ -16,9 +16,10 @@ This is the GigaionLLC fork of the archived [NanoTools/nanoNodeMonitor](https://
 
 ### Pulling the image
 
-Images are published to the **GitHub Container Registry (preferred)**:
+Images are published to the **GitHub Container Registry (preferred)**. The `latest`
+tag always tracks the default branch:
 
-    sudo docker pull ghcr.io/gigaionllc/nanonodemonitor
+    sudo docker pull ghcr.io/gigaionllc/nanonodemonitor:latest
 
 They are also pushed to Docker Hub as a secondary, legacy location:
 
@@ -37,13 +38,13 @@ Edit it according to your needs and you're good to go!
 
 1. Create a directory called _nano_ and go inside it: `mkdir nano && cd nano`
 
-2. Create a new file called _docker-compose.yml_ with the following contents (but replace the TAG with a proper version):
+2. Create a new file called _docker-compose.yml_ with the following contents (use the `latest` monitor tag, or pin a release version; replace the node TAG with a proper version):
 
 ```
 version: '3'
 services:
   monitor:
-    image: "ghcr.io/gigaionllc/nanonodemonitor:TAG"
+    image: "ghcr.io/gigaionllc/nanonodemonitor:latest"
     restart: "unless-stopped"
     ports:
      - "80:80"
