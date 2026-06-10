@@ -1,7 +1,7 @@
 <?php
 
 // the project version
-define('PROJECT_VERSION', '1.9.0');
+define('PROJECT_VERSION', '1.9.1');
 
 // current config.php schema version; bump when config migration rules
 // are added to scripts/migrate-config.php
