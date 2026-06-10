@@ -4,6 +4,10 @@
 // Please head to the config.sample.php
 // and follow the instructions
 
+// Config schema version. Configs written before versioning existed
+// default to 0; scripts/migrate-config.php upgrades them.
+$configVersion = 0;
+
 // ----------- General Variables -----------
 
 // Currency 'nano' or 'banano'

@@ -70,6 +70,15 @@ Every setting has a default in `defaults.php`; operators override variables in
 setting: add the default to `defaults.php`, document it commented-out in
 `config.sample.php`, and never read it before `includes.php` ran.
 
+Configs carry a `$configVersion` schema marker (`0` for legacy files,
+`CONFIG_VERSION` in `constants.php` is current). `scripts/migrate-config.php`
+upgrades old configs: it loads defaults + the user's config, applies sequential
+per-version migration steps, backs up the old file, and writes a minimal config
+containing only non-default values. When a config change needs migration (renamed
+setting, retired option value), bump `CONFIG_VERSION` and add a step to the
+`$migrations` array keyed by the new version — steps run once per config, so
+one-time rules (like the v1 dark→modern theme move) never re-fire.
+
 ## Security conventions
 
 These were deliberate hardening decisions — do not regress them:

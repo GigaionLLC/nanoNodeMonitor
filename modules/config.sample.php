@@ -6,6 +6,10 @@
 // To edit a config uncomment the line, otherwise
 // defaults will be used for each variable.
 
+// Config schema version - leave as is. Used by scripts/migrate-config.php
+// to upgrade older config files.
+$configVersion = 1;
+
 // ----------- General Variables -----------
 
 // To switch between monitoring Nano / Banano nodes,

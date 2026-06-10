@@ -3,6 +3,10 @@
 // the project version
 define('PROJECT_VERSION', '1.9.0');
 
+// current config.php schema version; bump when config migration rules
+// are added to scripts/migrate-config.php
+define('CONFIG_VERSION', 1);
+
 // project URL
 define('PROJECT_URL', 'https://github.com/gigaion/nanoNodeMonitor');
 

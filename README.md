@@ -101,6 +101,17 @@ Official documentation for creating an account on the node via RPC can be found 
 
 https://docs.nano.org/running-a-node/voting-as-a-representative/#step-2-setup-representative-account
 
+### Upgrading an existing config
+
+When upgrading from an older release, migrate your `config.php` to the current schema with:
+
+    php scripts/migrate-config.php
+
+The script backs up your old config, carries over all of your settings, maps defunct
+block explorers to `blocklattice`, and writes a clean minimal `config.php` with a
+`$configVersion` marker so future migrations know where to start. Use `--dry-run`
+to preview the result without changing anything.
+
 If you are running a standalone node you might need to modify the IP-address and the port for the RPC in the file `config.php`. It should match the corresponding entries in `~/Nano/config.json`, e.g.
 
 ```
