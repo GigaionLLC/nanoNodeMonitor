@@ -8,9 +8,9 @@ This is the GigaionLLC fork of the archived [NanoTools/nanoNodeMonitor](https://
 
 **AI-enhanced project.** Nano Node Monitor is developed, modernized, and maintained with extensive use of AI coding agents. The PHP 8.5 modernization, the security hardening, and the documentation were all produced and verified with AI assistance. Agent and contributor guidance follows the [AGENT.md](AGENT.md) standard.
 
-|Nano Light|Nano Dark|Banano Light|Banano Dark|
-|-|-|-|-|
-|![Light](.github/theme-preview/nano-light.png)|![Dark](.github/theme-preview/nano-dark.png)|![Banano](.github/theme-preview/banano-light.png)|![Banano Dark](.github/theme-preview/banano-dark.png)|
+|Nano Modern|Nano Light|Nano Dark|Banano Light|Banano Dark|
+|-|-|-|-|-|
+|![Modern](.github/theme-preview/nano-modern.png)|![Light](.github/theme-preview/nano-light.png)|![Dark](.github/theme-preview/nano-dark.png)|![Banano](.github/theme-preview/banano-light.png)|![Banano Dark](.github/theme-preview/banano-dark.png)|
 
 ## Docker Installation
 

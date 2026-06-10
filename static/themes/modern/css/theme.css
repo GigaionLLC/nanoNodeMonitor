@@ -1,0 +1,267 @@
+/* ------------------------------------------------------------------
+   Modern theme — a contemporary dark theme for Nano Node Monitor
+   Deep slate background, nano-blue accent, soft glass surfaces.
+   ------------------------------------------------------------------ */
+
+/* Load Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+    --bg:             #0c1118;
+    --bg-glow-1:      rgba(63, 169, 245, 0.10);
+    --bg-glow-2:      rgba(123, 102, 255, 0.07);
+    --surface:        rgba(255, 255, 255, 0.035);
+    --surface-raised: rgba(255, 255, 255, 0.055);
+    --border:         rgba(255, 255, 255, 0.08);
+    --text:           #d8dee9;
+    --text-dim:       #8a94a6;
+    --heading:        #f0f3f8;
+    --accent:         #3fa9f5;
+    --accent-soft:    rgba(63, 169, 245, 0.15);
+    --radius:         14px;
+    --shadow:         0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+/*
+
+ -- Body CSS
+
+ */
+
+body {
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    background-color: var(--bg);
+    background-image:
+        radial-gradient(900px 480px at 12% -8%, var(--bg-glow-1), transparent 60%),
+        radial-gradient(800px 420px at 92% 4%, var(--bg-glow-2), transparent 60%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: var(--text);
+    padding-top: 130px;
+    -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+    background: var(--accent-soft);
+    color: var(--heading);
+}
+
+/*
+
+ -- Navigation Menu CSS
+
+ */
+
+.navbar {
+    font-size: 1.05rem;
+    line-height: 1.6rem;
+    letter-spacing: 0.02rem;
+    font-weight: 500;
+    background-color: rgba(12, 17, 24, 0.78);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    padding: 1.1% 4%;
+    border-bottom: 1px solid var(--border);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(63,169,245,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}
+
+.n-logo-theme {
+    color: var(--heading);
+    padding-left: 12px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.nav-link {
+    color: var(--text-dim);
+    border-radius: 8px;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+}
+
+.nav-link:hover {
+    color: var(--heading);
+    background: var(--surface-raised);
+}
+
+/*
+
+ -- Body Content CSS
+
+ */
+
+h2 {
+    font-size: 2.4rem;
+    line-height: 2.9rem;
+    font-weight: 600;
+    max-width: 930px;
+    color: var(--heading);
+}
+
+h3 {
+    font-size: 0.82rem;
+    font-weight: 600;
+    max-width: 930px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 0.8rem;
+    padding-left: 0.75rem;
+    border-left: 3px solid var(--accent);
+}
+
+p {
+    font-size: 0.92rem;
+    line-height: 1.45rem;
+    letter-spacing: 0.01em;
+}
+
+.lead {
+    color: var(--heading);
+    font-weight: 500;
+}
+
+/* glass panels: both bare .list-group columns and .card-wrapped ones */
+
+.card {
+    background-color: transparent !important;
+    border: none;
+    font-size: 0.9rem;
+}
+
+.list-group {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.list-group:hover {
+    transform: translateY(-2px);
+    border-color: rgba(63, 169, 245, 0.35);
+}
+
+.list-group-item {
+    background-color: transparent !important;
+    color: var(--text) !important;
+    border: none;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+    padding: 0.85rem 1.1rem;
+}
+
+.list-group-item:first-child {
+    border-top: none;
+}
+
+/* metric labels on the left, values on the right */
+.float-left-truncate {
+    color: var(--text-dim);
+}
+
+.float-right-truncate {
+    color: var(--heading);
+    font-variant-numeric: tabular-nums;
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
+a:hover {
+    color: #7cc4f8;
+    text-decoration: none;
+}
+
+/* social buttons in the banner */
+.btn-secondary {
+    background-color: var(--surface-raised);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 10px;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.btn-secondary:hover {
+    background-color: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--heading);
+}
+
+/* update alert */
+.alert-warning {
+    background-color: var(--accent-soft);
+    border: 1px solid rgba(63, 169, 245, 0.4);
+    border-radius: var(--radius);
+    color: var(--heading);
+}
+
+.alert-warning .alert-link,
+.alert-warning .close {
+    color: var(--accent);
+}
+
+/* loading spinner */
+#content > .fa-spinner {
+    color: var(--accent);
+}
+
+/* soften the QR widget against the dark page */
+.n-widget-qr {
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow);
+}
+
+hr.light {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 1em 0;
+    padding: 0;
+    opacity: 1;
+}
+
+.btn-clipboard,
+.btn-clipboard-light {
+    color: var(--text-dim);
+}
+
+.btn-clipboard:hover,
+.btn-clipboard-light:hover {
+    color: var(--accent);
+}
+
+/* footer */
+#footer {
+    color: var(--text-dim);
+}
+
+#footer a {
+    color: var(--text-dim);
+}
+
+#footer a:hover {
+    color: var(--accent);
+}
+
+/* scrollbar (WebKit/Blink) */
+::-webkit-scrollbar {
+    width: 10px;
+    background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--surface-raised);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-soft);
+}

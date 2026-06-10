@@ -16,10 +16,10 @@
 // $currency = 'nano';
 
 // Theme of your Node Monitor
-// Nano Themes:   'dark' or 'light'
+// Nano Themes:   'modern' (default), 'dark' or 'light'
 // Banano Themes: 'banano' or 'banano-dark'
 // PAW Themes: 'paw'
-// $themeChoice = 'light';
+// $themeChoice = 'modern';
 
 // Choice of block explorer
 // Nano Explorers:      'blocklattice', 'ninja'
@@ -83,10 +83,10 @@
 // $nanoNodeRPCPort = '7076';
 
 // Account of this node
-// $nanoNodeAccount = 'nano_1f56swb9qtpy3yoxiscq9799nerek153w43yjc9atoaeg3e91cc9zfr89ehj';
+// $nanoNodeAccount = 'nano_11pb5aa6uirs9hoqsg4swnzyehoiqowj94kdpthwkhwufmtd6a11xx35iron';
 
 // Donation account for maintaining this node
-// $nanoDonationAccount = 'nano_1f56swb9qtpy3yoxiscq9799nerek153w43yjc9atoaeg3e91cc9zfr89ehj';
+// $nanoDonationAccount = 'nano_11pb5aa6uirs9hoqsg4swnzyehoiqowj94kdpthwkhwufmtd6a11xx35iron';
 
 // Number of decimal places to display Nano balances, i.e.
 // $nanoNumDecimalPlaces = 2;

@@ -10,9 +10,9 @@
 $currency = 'nano';
 
 // Theme of your Node Monitor
-// Nano Themes:   'dark' or 'light'
+// Nano Themes:   'modern', 'dark' or 'light'
 // Banano Themes: 'banano' or 'banano-dark'
-$themeChoice = 'light';
+$themeChoice = 'modern';
 
 // Choice of block explorer
 // Nano Explorers:      'blocklattice', 'ninja'
