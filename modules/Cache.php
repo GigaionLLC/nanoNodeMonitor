@@ -1,6 +1,5 @@
 <?php
 
-require_once __DIR__.'/cache/ApcCache.php';
 require_once __DIR__.'/cache/ApcuCache.php';
 require_once __DIR__.'/cache/FileCache.php';
 require_once __DIR__.'/cache/RedisCache.php';
@@ -10,7 +9,8 @@ abstract class Cache {
   public static function factory() {
     global $cache;
     switch ($cache["engine"]) {
-      case 'apc': return new ApcCache($cache['options']);
+      // the APC extension is gone since PHP 7; 'apc' maps to its successor APCu
+      case 'apc':
       case 'apcu': return new ApcuCache($cache['options']);
       case 'files': return new FileCache($cache['options']);
       case 'redis': return new RedisCache($cache['options']);

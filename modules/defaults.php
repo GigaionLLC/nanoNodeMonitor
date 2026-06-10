@@ -15,13 +15,14 @@ $currency = 'nano';
 $themeChoice = 'light';
 
 // Choice of block explorer
-// Nano Explorers:      'ninja', 'nanocrawler'
+// Nano Explorers:      'blocklattice', 'ninja'
 // Nano Beta Explorers: 'nanocrawler-beta'
 // Banano Explorers:    'bananocreeper', 'bananolooker', 'yellowspyglass'
-$blockExplorer = 'nanocrawler';
+// PAW Explorers:       'tracker'
+$blockExplorer = 'blocklattice';
 
 // Choice of widget
-// Options: 'qr', 'natricon', 'monkey'
+// Options: 'qr', 'natricon', 'monkey', 'paw'
 $widgetType = 'qr';
 
 // autorefresh interval for the status webpage in seconds
@@ -58,10 +59,10 @@ $cache = [
 
 // ----------- Nano Node Variables -----------
 
-// IP address for RPC (default: 127.0.0.1)
+// IP address for RPC (default: [::1])
 $nanoNodeRPCIP   = '[::1]';
 
-// IP address for RPC (default: 7076)
+// Port for RPC (default: 7076)
 // Nano nodes typically use port 7076.
 // Banano nodes typically use port 7072.
 $nanoNodeRPCPort = '7076';

@@ -22,11 +22,11 @@
 // $themeChoice = 'light';
 
 // Choice of block explorer
-// Nano Explorers:      'ninja', 'nanocrawler'
+// Nano Explorers:      'blocklattice', 'ninja'
 // Nano Beta Explorers: 'nanocrawler-beta'
 // Banano Explorers:    'bananocreeper', 'bananolooker', 'yellowspyglass'
 // PAW Explorers:       'tracker'
-// $blockExplorer = 'nanocrawler';
+// $blockExplorer = 'blocklattice';
 
 // Choice of widget
 // Options: 'qr', 'natricon', 'monkey', 'paw'

@@ -148,7 +148,6 @@ $data = $cache->fetch($apiName, function () use (
     $data->systemUptime = $systemUptimeStr;
     $data->usedMem = getSystemUsedMem();
     $data->totalMem = getSystemTotalMem();
-    //$data->uname = getUname();
     $data->nanoNodeName = $nanoNodeName;
     $data->nodeUptimeStartup = (int) (getUptime($ch)->{'seconds'} ?? 0);
 

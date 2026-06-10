@@ -91,10 +91,10 @@ function getAccountWeight($ch, $account)
   return postCurl($ch, $data);
 }
 
-// get number of peers
+// get node statistics
 function getStats($ch, $type = "counters")
 {
-  // get peers
+  // get stats
   $data = array(
     "action" => "stats", 
     "type" => $type);
@@ -126,7 +126,7 @@ function getUptime($ch)
 // get active difficulty
 function getActiveDifficulty($ch)
 {
-  // get uptime
+  // get active difficulty
   $data = array("action" => "active_difficulty");
 
   // post curl
@@ -136,17 +136,17 @@ function getActiveDifficulty($ch)
 // get telemetry data from other nodes
 function getTelemetry($ch)
 {
-  // get uptime
+  // get telemetry
   $data = array("action" => "telemetry");
 
   // post curl
   return postCurl($ch, $data);
 }
 
-// get telemetry data from other nodes
+// get number of delegators for an account
 function getDelegatorsCount($ch, $account)
 {
-  // get uptime
+  // get delegators count
   $data = array("action" => "delegators_count", "account" => $account);
 
   // post curl
