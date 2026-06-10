@@ -72,12 +72,21 @@ setting: add the default to `defaults.php`, document it commented-out in
 
 Configs carry a `$configVersion` schema marker (`0` for legacy files,
 `CONFIG_VERSION` in `constants.php` is current). `scripts/migrate-config.php`
-upgrades old configs: it loads defaults + the user's config, applies sequential
-per-version migration steps, backs up the old file, and writes a minimal config
-containing only non-default values. When a config change needs migration (renamed
-setting, retired option value), bump `CONFIG_VERSION` and add a step to the
+upgrades old configs (run automatically by `entry.sh` on container start): it
+loads defaults + the user's config, applies sequential per-version migration
+steps, backs up the old file, and writes a minimal config containing only
+non-default values. When a config change needs migration (renamed setting,
+retired option value), bump `CONFIG_VERSION` and add a step to the
 `$migrations` array keyed by the new version — steps run once per config, so
 one-time rules (like the v1 dark→modern theme move) never re-fire.
+
+The script token-scans the config source **before executing it** and skips
+configs containing custom PHP logic (control flow, superglobals like
+`$_SERVER`, `die`/`exit`, output, includes). Never weaken this: operators run
+hand-crafted configs with host-based switching and request guards, and
+flattening one would bake in a single branch of that logic. Scripted configs
+silence the startup notice by declaring a literal `$configVersion = N;` at the
+current schema, which the script reads via regex without executing the file.
 
 ## Security conventions
 

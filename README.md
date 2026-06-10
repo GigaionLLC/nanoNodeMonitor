@@ -114,6 +114,10 @@ block explorers to `blocklattice`, and writes a clean minimal `config.php` with 
 `$configVersion` marker so future migrations know where to start. Use `--dry-run`
 to preview the result without changing anything.
 
+Configs containing custom PHP logic (e.g. switching on `$_SERVER['HTTP_HOST']`)
+are detected and never rewritten — update those manually against `config.sample.php`
+and add `$configVersion = 1;` to mark them current.
+
 If you are running a standalone node you might need to modify the IP-address and the port for the RPC in the file `config.php`. It should match the corresponding entries in `~/Nano/config.json`, e.g.
 
 ```
