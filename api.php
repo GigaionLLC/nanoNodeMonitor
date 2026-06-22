@@ -45,17 +45,25 @@ $data = $cache->fetch($apiName, function () use (
     $data->protocol_version = (int) ($version->{'protocol_version'} ?? 0);
     $data->store_vendor = (string) ($version->{'store_vendor'} ?? '');
 
+    // Point the update check at the GitHub repo matching the node implementation:
+    // RsNano ships from rsnano-node/rsnano-node with its own version stream, so
+    // it must not be compared against (or linked to) mainline nano-node releases.
+    $isRsNano = isRsNanoNode($data->version);
+    $nodeReleaseApiUrl = $isRsNano ? RSNANO_NODE_RELEASE_API_URL : NANO_NODE_RELEASE_API_URL;
+    $data->nodeReleaseUrl = $isRsNano ? RSNANO_NODE_RELEASE_URL : NANO_NODE_RELEASE_URL;
+    $data->nodeReleaseName = $isRsNano ? 'RsNano' : 'Nano Node';
+
     // Cache the github query for latest node version
     global $nodeVersionCache;
     $nodeVersionCache = new FileCache(['ttl' => 10 * 60]); // cache for 10 minutes
 
-    // set a cache name so multiple monitors don't mix
-    $cacheName = "nodeVersionCache-$nanoNodeAccount";
+    // set a cache name so multiple monitors (and node implementations) don't mix
+    $cacheName = "nodeVersionCache-" . ($isRsNano ? 'rsnano' : 'nano') . "-$nanoNodeAccount";
 
     // get cached response
-    $nodeVersionData = $nodeVersionCache->fetch($cacheName, function () {
+    $nodeVersionData = $nodeVersionCache->fetch($cacheName, function () use ($nodeReleaseApiUrl) {
         $nodeVersionData = new stdClass();
-        $nodeVersionData->latestNodeReleaseVersion = getLatestNodeReleaseVersion();
+        $nodeVersionData->latestNodeReleaseVersion = getLatestNodeReleaseVersion($nodeReleaseApiUrl);
 
         return $nodeVersionData;
     });

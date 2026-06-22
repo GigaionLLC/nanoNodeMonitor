@@ -13,6 +13,14 @@ define('PROJECT_URL', 'https://github.com/GigaionLLC/nanoNodeMonitor');
 // URL to get version of latest release from github
 define('GITHUB_LATEST_API_URL', 'https://api.github.com/repos/GigaionLLC/nanoNodeMonitor/releases/latest');
 
+// Per-implementation node release sources. RsNano is an independent Rust
+// rewrite with its own release stream, so its version must be checked against
+// (and its download link point at) the rsnano-node repo rather than mainline.
+define('NANO_NODE_RELEASE_API_URL', 'https://api.github.com/repos/nanocurrency/nano-node/releases/latest');
+define('NANO_NODE_RELEASE_URL', 'https://github.com/nanocurrency/nano-node/releases/latest');
+define('RSNANO_NODE_RELEASE_API_URL', 'https://api.github.com/repos/rsnano-node/rsnano-node/releases/latest');
+define('RSNANO_NODE_RELEASE_URL', 'https://github.com/rsnano-node/rsnano-node/releases/latest');
+
 // nano rep account for Nano Node Monitor 
 define ('NODEMON_REP_ACCOUNT', 'nano_11pb5aa6uirs9hoqsg4swnzyehoiqowj94kdpthwkhwufmtd6a11xx35iron');
 

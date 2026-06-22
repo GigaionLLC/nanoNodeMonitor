@@ -1,9 +1,9 @@
 {{#if newNodeVersionAvailable}}
 <div class="alert alert-dismissible alert-warning">
   <button type="button" class="close" data-dismiss="alert">&times;</button>
-  <strong>Heads up!</strong> A new Nano Node version
+  <strong>Heads up!</strong> A new {{nodeReleaseName}} version
   <strong>{{newNodeVersionAvailable}}</strong> is available.
-  <a class="alert-link" href="https://github.com/nanocurrency/nano-node/releases/latest" target="_blank" rel="noopener">Download it here!</a>
+  <a class="alert-link" href="{{nodeReleaseUrl}}" target="_blank" rel="noopener">Download it here!</a>
 </div>
 {{/if}}
 

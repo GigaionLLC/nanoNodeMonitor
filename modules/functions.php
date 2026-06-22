@@ -179,15 +179,16 @@ function getVersionInformation($latestVersion)
 
 }
 
-// get version of latest release from github
-function getLatestNodeReleaseVersion()
+// get version of latest release from github for the given release API URL
+// (defaults to mainline nano-node; pass RSNANO_NODE_RELEASE_API_URL for RsNano)
+function getLatestNodeReleaseVersion($apiUrl = NANO_NODE_RELEASE_API_URL)
 {
 
   // get release tag of "latest" from github
   $curl = curl_init();
 
   curl_setopt_array($curl, array(
-    CURLOPT_URL => 'https://api.github.com/repos/nanocurrency/nano-node/releases/latest',
+    CURLOPT_URL => $apiUrl,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     CURLOPT_MAXREDIRS => 10,
@@ -227,19 +228,26 @@ function formatVersion($rawversion){
   return ltrim(end($formattedVersionArray), 'Vv');
 }
 
-// get a string with information about the
-// current version and possible updates
+// detect RsNano, the independent Rust rewrite of nano-node, from the node's
+// reported vendor string (e.g. "RsNano V3.1")
+function isRsNanoNode($nodeVendor)
+{
+  return stripos((string) $nodeVendor, 'RsNano') !== false;
+}
+
+// returns the latest version string when the running node is behind it,
+// otherwise false. $latestVersion is the release the caller looked up for
+// this node's implementation (mainline nano-node or RsNano).
 function isNewNodeVersionAvailable($currentVersion, $latestVersion, $currency)
 {
 
-  // for now, we can only check nano reliably
+  // for now, we can only check nano reliably (covers mainline nano-node and
+  // RsNano, both reported as the "nano" currency)
   if ($currency != "nano") {
     return false;
-  } 
+  }
 
-  $currentVersion = $currentVersion;
-
-  if ( version_compare($currentVersion, (string) $latestVersion) < 0 ){
+  if ( version_compare((string) $currentVersion, (string) $latestVersion) < 0 ){
     return $latestVersion;
   } else {
     return false;
