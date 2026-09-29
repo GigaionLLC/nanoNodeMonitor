@@ -29,6 +29,12 @@ class FileCache extends Cache
     private $ttl = 30;
 
     /**
+     * Result of the base directory safety check (null = not checked yet).
+     * @var bool|null
+     */
+    private $cache_dir_safe = null;
+
+    /**
      * Creates a FileCache object
      *
      * @param array $options
@@ -56,9 +62,12 @@ class FileCache extends Cache
      */
     public function read($id)
     {
+        if (!$this->isCacheDirectorySafe()) {
+            return NULL;
+        }
         $file_name = $this->getFileName($id);
 
-        if (!is_file($file_name) || !is_readable($file_name)) {
+        if (is_link($file_name) || !is_file($file_name) || !is_readable($file_name)) {
             return NULL;
         }
 
@@ -97,13 +106,13 @@ class FileCache extends Cache
      */
     public function write($id, $data)
     {
-        $dir = $this->getDirectory($id);
-        if (!is_dir($dir)) {
-            if (!@mkdir($dir, 0700, true) && !is_dir($dir)) {
-                return false;
-            }
+        if (!$this->isCacheDirectorySafe() || !$this->ensureDirectory($id)) {
+            return false;
         }
         $file_name = $this->getFileName($id);
+        if (is_link($file_name)) {
+            return false;
+        }
         $lifetime  = time() + $this->ttl;
         $encoded   = json_encode($data);
         $result    = file_put_contents($file_name, $lifetime . PHP_EOL . $encoded, LOCK_EX);
@@ -116,6 +125,62 @@ class FileCache extends Cache
     //------------------------------------------------
     // PRIVATE METHODS
     //------------------------------------------------
+
+    /**
+     * Creates the entry's sub directory inside the (already checked) base dir.
+     *
+     * @param string $id
+     *
+     * @return bool
+     */
+    protected function ensureDirectory($id)
+    {
+        $dir = $this->getDirectory($id);
+        if (!is_dir($dir)) {
+            if (!@mkdir($dir, 0700, true) && !is_dir($dir)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks that the base cache directory can be trusted.
+     *
+     * The default directory lives in the shared system temp dir, where another
+     * local user could pre-create it (world-writable, or as a symlink) and
+     * plant or redirect cache files. Only use it if it is a real directory
+     * owned by the effective user of this process and not world-writable.
+     * Otherwise the cache is disabled (NullCache behaviour), never fatal.
+     * POSIX mode/owner checks are skipped on Windows, where they do not apply.
+     *
+     * @return bool
+     */
+    protected function isCacheDirectorySafe()
+    {
+        if ($this->cache_dir_safe !== null) {
+            return $this->cache_dir_safe;
+        }
+        $base = $this->getCacheDirectory();
+        if (!is_link($base) && !is_dir($base)) {
+            @mkdir($base, 0700, true);
+        }
+        clearstatcache(true, $base);
+
+        $safe = !is_link($base) && is_dir($base);
+        if ($safe && PHP_OS_FAMILY !== 'Windows') {
+            $perms = @fileperms($base);
+            $safe  = $perms !== false && ($perms & 0002) === 0;
+            if ($safe && function_exists('posix_geteuid')) {
+                $safe = @fileowner($base) === posix_geteuid();
+            }
+        }
+        if (!$safe) {
+            error_log("nanoNodeMonitor: cache directory $base is not safe to use "
+                . "(symlink, world-writable or owned by another user) - file cache disabled");
+        }
+        return $this->cache_dir_safe = $safe;
+    }
 
     /**
      * Fetches a directory to store the cache data
