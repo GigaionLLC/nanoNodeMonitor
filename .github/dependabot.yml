@@ -1,0 +1,9 @@
+# Weekly PRs for outdated GitHub Actions. The PHP base image is a floating
+# tag (php:8.5-apache) refreshed by the nightly rebuild, and the vendored JS
+# in static/js is updated by hand (no package manager).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
