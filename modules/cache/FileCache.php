@@ -35,6 +35,11 @@ class FileCache extends Cache
     private $cache_dir_safe = null;
 
     /**
+     * Maximum time in seconds to wait for another request's rebuild.
+     */
+    const LOCK_WAIT_SECONDS = 10;
+
+    /**
      * Creates a FileCache object
      *
      * @param array $options
@@ -122,9 +127,83 @@ class FileCache extends Cache
         return true;
     }
 
+    /**
+     * Fetches an entry, rebuilding it with $callback when missing/expired.
+     *
+     * Single-flight: only one request rebuilds an expired entry. The rebuild
+     * runs under an exclusive flock() on "<cachefile>.lock"; concurrent
+     * requests wait (bounded) for it and then read the fresh entry instead
+     * of all hitting the node at once. The lock is released automatically
+     * if the callback exits (e.g. node down -> HTTP 503). If locking is not
+     * possible, or the wait times out, this falls back to the plain
+     * read-callback-write behaviour.
+     *
+     * @param string   $id
+     * @param callable $callback
+     */
+    public function fetch($id, $callback)
+    {
+        $data = $this->read($id);
+        if (!is_null($data)) {
+            return $data;
+        }
+
+        $lock = $this->acquireLock($id);
+        if ($lock === null) {
+            $data = $callback();
+            $this->write($id, $data);
+            return $data;
+        }
+
+        try {
+            // another request may have rebuilt the entry while we waited
+            $data = $this->read($id);
+            if (is_null($data)) {
+                $data = $callback();
+                $this->write($id, $data);
+            }
+        } finally {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+        }
+        return $data;
+    }
+
     //------------------------------------------------
     // PRIVATE METHODS
     //------------------------------------------------
+
+    /**
+     * Takes the rebuild lock for an entry.
+     *
+     * @param string $id
+     *
+     * @return resource|null  locked handle, or null when locking is not possible
+     */
+    protected function acquireLock($id)
+    {
+        if (!$this->isCacheDirectorySafe() || !$this->ensureDirectory($id)) {
+            return null;
+        }
+        $lock_name = $this->getFileName($id) . '.lock';
+        if (is_link($lock_name)) {
+            return null;
+        }
+        $handle = @fopen($lock_name, 'c');
+        if ($handle === false) {
+            return null;
+        }
+        $deadline = microtime(true) + self::LOCK_WAIT_SECONDS;
+        do {
+            if (flock($handle, LOCK_EX | LOCK_NB)) {
+                return $handle;
+            }
+            usleep(50000);
+        } while (microtime(true) < $deadline);
+
+        fclose($handle);
+        return null;
+    }
 
     /**
      * Creates the entry's sub directory inside the (already checked) base dir.
