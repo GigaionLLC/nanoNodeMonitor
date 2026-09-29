@@ -74,6 +74,19 @@ services:
 
 6. Done!
 
+## Node RPC safety
+
+The monitor only uses read-only RPC actions (`version`, `block_count`, `peers`,
+`account_balance`, `telemetry`, ...). It never needs wallet or control actions, so:
+
+- Keep `enable_control = false` in the node's `config-rpc.toml`.
+- Bind RPC to localhost (`::1` / `127.0.0.1`) or to the Docker network only. Never
+  publish port 7076 on a public interface (the Compose example above uses
+  `127.0.0.1:7076:7076` for that reason).
+- When the monitor reaches the node by container name, any other container on the same
+  Docker network can reach the RPC as well, which is one more reason to keep
+  `enable_control` off.
+
 ## Manual Installation
 
 ### Prerequisites
