@@ -1,0 +1,10 @@
+# Hide repository metadata and docs on installs that git-clone the project
+# into the webroot. Uses only mod_alias (AllowOverride FileInfo), answering
+# 404 as if the files were not there. The page itself (index.php, api.php,
+# templates/, static/) is unaffected.
+<IfModule mod_alias.c>
+    RedirectMatch 404 "/\.(git|github)(/|$)"
+    RedirectMatch 404 "/\.(gitignore|dockerignore)$"
+    RedirectMatch 404 "(?i)\.(md|yml|yaml|sh|ps1)$"
+    RedirectMatch 404 "/Dockerfile$"
+</IfModule>

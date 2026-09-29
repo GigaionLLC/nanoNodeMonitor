@@ -3,3 +3,4 @@ modules/config.php
 .idea/
 nanote.txt
 nanoNodeMonitor
+modules/config.backup-*.php

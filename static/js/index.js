@@ -80,10 +80,30 @@ function updateStats(){
   .catch(function (error) {
     console.log('FAIL', error);
     if(error.response){
-      document.getElementById("content").innerHTML = error.response.data;
+      showError(error.response.data);
     }
   })
   .finally(function () {
     setTimeout(updateStats, GLOBAL_REFRESH * 1000);
   });
+}
+
+// Render an API error as plain text in the .myError box. The response body is
+// never inserted as markup: only its text is extracted (myError() sends
+// '<div class="myError">message</div>'; proxies/CDNs may send full pages).
+function showError(data){
+  var text = '';
+  if (typeof data === 'string') {
+    try {
+      text = new DOMParser().parseFromString(data, 'text/html').body.textContent;
+    } catch (e) {
+      text = '';
+    }
+  }
+  var box = document.createElement('div');
+  box.className = 'myError';
+  box.textContent = (text && text.trim()) ? text : 'API error';
+  var content = document.getElementById('content');
+  content.textContent = '';
+  content.appendChild(box);
 }

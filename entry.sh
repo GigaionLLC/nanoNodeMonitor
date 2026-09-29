@@ -19,8 +19,11 @@ ln -s $monitordir/config.php /var/www/html/modules/config.php
 # the old file next to it on the volume). Never blocks the web server.
 php /var/www/html/scripts/migrate-config.php || echo "WARNING: config migration failed, starting with existing config."
 
-# change folder rights so www-data can read
-chmod 755 /opt
+# let www-data reach the config. /opt only needs traverse (o+x), not
+# read/list: with the legacy `-v ~:/opt` mount /opt *is* the host home
+# directory, which must not be made listable for other users.
+chmod o+x /opt
+chmod 755 "${monitordir}"
 
 # start apache
 apache2-foreground

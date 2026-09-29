@@ -29,10 +29,17 @@ They are also pushed to Docker Hub as a secondary, legacy location:
 
 #### Standalone
 
-    sudo docker run -d -p 80:80 -v ~:/opt --restart=unless-stopped ghcr.io/gigaionllc/nanonodemonitor
+    sudo docker run -d -p 80:80 -v ~/nanoNodeMonitor:/opt/nanoNodeMonitor --restart=unless-stopped ghcr.io/gigaionllc/nanonodemonitor
 
 This will create a directory called _nanoNodeMonitor_ inside your home directory with the _config.php_ inside it.
 Edit it according to your needs and you're good to go!
+
+> **Upgrading from an older setup?** Earlier versions of this README mounted the whole
+> home directory (`-v ~:/opt`). That still works, but it gives the monitor container
+> access to everything in your home directory (in the Compose setup that includes the
+> node's wallet files). Switch to the narrower mounts shown here; your config stays in
+> the same place (`~/nanoNodeMonitor/config.php`), and in Compose the node's data stays
+> in `~/Nano` as before.
 
 #### Docker Compose
 
@@ -49,7 +56,7 @@ services:
     ports:
      - "80:80"
     volumes:
-     - "~:/opt"
+     - "~/nanoNodeMonitor:/opt/nanoNodeMonitor"
   node:
     image: "nanocurrency/nano:TAG"
     restart: "unless-stopped"
@@ -57,7 +64,7 @@ services:
      - "7075:7075"
      - "127.0.0.1:7076:7076"
     volumes:
-     - "~:/root"
+     - "~/Nano:/root/Nano"
 ```
 3. Nice! Now execute `sudo docker-compose up -d` to start everything.
 
@@ -66,6 +73,19 @@ services:
 5. You will have to change the node IP to the name of the nodes Docker container e.g. `nano_node_1`. Edit the other things as well if you want to.
 
 6. Done!
+
+## Node RPC safety
+
+The monitor only uses read-only RPC actions (`version`, `block_count`, `peers`,
+`account_balance`, `telemetry`, ...). It never needs wallet or control actions, so:
+
+- Keep `enable_control = false` in the node's `config-rpc.toml`.
+- Bind RPC to localhost (`::1` / `127.0.0.1`) or to the Docker network only. Never
+  publish port 7076 on a public interface (the Compose example above uses
+  `127.0.0.1:7076:7076` for that reason).
+- When the monitor reaches the node by container name, any other container on the same
+  Docker network can reach the RPC as well, which is one more reason to keep
+  `enable_control` off.
 
 ## Manual Installation
 

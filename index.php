@@ -1,4 +1,9 @@
 <?php
+// security headers (sent before any output). No X-Frame-Options /
+// frame-ancestors on purpose: operators may embed the status page.
+header('X-Content-Type-Options: nosniff');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+
 // include required files
 require_once __DIR__.'/modules/includes.php';
 
