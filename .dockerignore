@@ -3,3 +3,4 @@
 build.txt
 docker-compose.dev.yml
 modules/config.php
+modules/config.backup-*.php

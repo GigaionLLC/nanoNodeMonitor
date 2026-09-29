@@ -212,13 +212,19 @@ if ($dryRun) {
     exit(0);
 }
 
-$backupPath = $configPath . '.bak-' . date('Ymd-His');
+// The backup keeps a .php extension so a web server executes it (printing
+// nothing) instead of serving the config source as plain text when it sits
+// in a webroot (manual installs keep config.php in modules/). It also keeps
+// the original's permission bits instead of the default umask.
+$backupPath = dirname($configPath) . '/config.backup-' . date('Ymd-His') . '.php';
 if (!copy($configPath, $backupPath)) {
     exit("ERROR: could not back up config.php to $backupPath - aborting.\n");
 }
+@chmod($backupPath, fileperms($configPath) & 0777);
 echo "  - old config backed up to " . basename($backupPath) . "\n";
 
 if (file_put_contents($configPath, $out, LOCK_EX) === false) {
+    copy($backupPath, $configPath);
     exit("ERROR: could not write $configPath. Old config restored from backup.\n");
 }
 
