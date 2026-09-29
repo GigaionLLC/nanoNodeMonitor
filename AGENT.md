@@ -43,6 +43,7 @@ modules/
 templates/index.hbs     Handlebars template rendered client-side with api.php data
 static/                 Vendored CSS/JS, themes, images (no build step)
 Dockerfile, entry.sh    Docker image; entry.sh symlinks /opt/nanoNodeMonitor/config.php
+.htaccess (root, modules/, scripts/)   Apache access rules (see Security conventions)
 ```
 
 ## Architecture / request flow
@@ -57,6 +58,10 @@ Dockerfile, entry.sh    Docker image; entry.sh symlinks /opt/nanoNodeMonitor/con
    node version, block counts, peers, confirmation-time percentiles, account
    balance/representative/weight, host system load/memory/uptime, telemetry, and sync
    percentage. Cache TTL (default 30 s) shields the node from request bursts.
+   `FileCache` and `ApcuCache` override `fetch()` single-flight: only one request
+   rebuilds an expired entry (flock on `<cachefile>.lock` / `apcu_add` lock), the
+   others wait up to 10 s and re-read; if locking fails they fall back to plain
+   read-callback-write.
 4. **RPC layer** — `functions_rpc.php` has one function per RPC action; all go through
    `postCurl()`, which POSTs JSON to `http://$nanoNodeRPCIP:$nanoNodeRPCPort` and dies
    with an HTTP 503 (`myError()`) when the node is unreachable.
@@ -74,7 +79,8 @@ Configs carry a `$configVersion` schema marker (`0` for legacy files,
 `CONFIG_VERSION` in `constants.php` is current). `scripts/migrate-config.php`
 upgrades old configs (run automatically by `entry.sh` on container start): it
 loads defaults + the user's config, applies sequential per-version migration
-steps, backs up the old file, and writes a minimal config containing only
+steps, backs up the old file (as `config.backup-<Ymd-His>.php` next to it, with
+the original's permission bits, so a web server never serves it as text), and writes a minimal config containing only
 non-default values. When a config change needs migration (renamed setting,
 retired option value), bump `CONFIG_VERSION` and add a step to the
 `$migrations` array keyed by the new version — steps run once per config, so
@@ -102,6 +108,27 @@ These were deliberate hardening decisions — do not regress them:
 - **Never use `unserialize()` on cache or request data.** `FileCache` stores JSON
   (a malicious serialized payload in a predictable cache path would otherwise allow
   PHP object injection). `RedisCache` also uses JSON.
+- **`FileCache` only trusts a safe base directory**: a real directory (not a
+  symlink), owned by the effective user (`posix_geteuid()`) and not world-writable;
+  cache files that are symlinks are never read or written. Otherwise it behaves
+  like `NullCache` (logged via `error_log`), never fatal. Mode/owner checks are
+  skipped on Windows.
+- **Web access rules**: `modules/.htaccess` and `scripts/.htaccess` deny all
+  requests, so nothing the browser needs may live there (the page loads only
+  `index.php`, `api.php`, `templates/` and `static/`). The root `.htaccess` 404s
+  `.git/`, `.github/`, dotfiles, `*.md/yml/yaml/sh/ps1` and `Dockerfile` using only
+  `mod_alias` (keep it to `AllowOverride FileInfo` directives so it cannot 500 the
+  page on restricted hosts). `.dockerignore` must keep `!.htaccess`.
+- `index.php` sends `X-Content-Type-Options: nosniff` and
+  `Referrer-Policy: strict-origin-when-cross-origin`. No `X-Frame-Options` /
+  `frame-ancestors`: operators embed the page.
+- Client-side errors are shown via `textContent` (`showError()` in `index.js`),
+  never by assigning response data to `innerHTML`.
+- Docker: `entry.sh` only adds traverse (`o+x`) to `/opt` and makes the config dir
+  755; never chmod or broaden mounts beyond `/opt/nanoNodeMonitor` (legacy
+  `-v ~:/opt` mounts make `/opt` the operator's home directory).
+- Workflow actions are pinned to full commit SHAs (`# vX.Y.Z` comment);
+  Dependabot updates them.
 - **Escape all config/host-derived values in templates** with the `e()` helper
   (`htmlspecialchars`, ENT_QUOTES). Account values embedded in third-party image URLs
   are additionally `rawurlencode()`d. Values echoed into inline JS use `(int)` casts or
