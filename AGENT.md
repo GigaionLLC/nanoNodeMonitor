@@ -20,7 +20,7 @@ PHP 8.1–8.5.
   files are pulled in with `require_once` via `modules/includes.php`. Keep it that way
   unless explicitly asked otherwise.
 - **php-curl** is the only required extension (checked at startup in `includes.php`).
-- Frontend is static, vendored JS (axios, Handlebars 4.7.7, bootstrap-native, clipboard.js)
+- Frontend is static, vendored JS (axios 0.34, Handlebars 4.7.9, bootstrap-native, clipboard.js)
   with no build step. Do not introduce npm/bundlers.
 - Deployed either on a plain Apache/PHP webroot or via the Docker image
   (`php:8.5-apache`, see `Dockerfile` + `entry.sh`).
