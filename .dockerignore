@@ -1,4 +1,5 @@
 .*
+!.htaccess
 *.md
 build.txt
 docker-compose.dev.yml
