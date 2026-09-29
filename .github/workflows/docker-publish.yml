@@ -16,6 +16,8 @@ on:
 permissions:
   contents: read
   packages: write
+  # lets the nightly run re-enable this workflow (keepalive, see last step)
+  actions: write
 
 jobs:
   docker:
@@ -81,3 +83,11 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+      # GitHub disables scheduled workflows after 60 days without repository
+      # activity, which silently stops the nightly base-image rebuilds. The
+      # nightly run re-enables itself via the API to reset that timer.
+      - name: Keep nightly schedule alive
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/docker-publish.yml/enable"

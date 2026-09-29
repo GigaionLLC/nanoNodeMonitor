@@ -15,6 +15,11 @@ LABEL org.opencontainers.image.source="https://github.com/GigaionLLC/nanoNodeMon
 RUN echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf \
     && a2enconf servername
 
+# don't advertise Apache/PHP versions in headers and error pages
+RUN printf 'ServerTokens Prod\nServerSignature Off\n' > /etc/apache2/conf-available/zz-hardening.conf \
+    && a2enconf zz-hardening \
+    && printf 'expose_php = Off\n' > /usr/local/etc/php/conf.d/zz-hardening.ini
+
 # copy all contents to public html
 COPY . /var/www/html
 
