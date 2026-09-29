@@ -62,7 +62,66 @@ function nnm_config_is_scripted($source, &$reason)
             return true;
         }
     }
-    return false;
+
+    return !nnm_config_is_plain($source, $reason);
+}
+
+/**
+ * Allowlist pass: a config is "plain" (safe to execute and flatten) only if
+ * it consists of variable assignments of literals, arrays, constants and
+ * simple arithmetic/concatenation. Anything else - function calls, getenv(),
+ * backticks, new, eval, ?:, fn, match, heredocs, inline HTML... - means
+ * the file is treated as scripted and left untouched, so values the operator
+ * deliberately computes at runtime (e.g. secrets from the environment) are
+ * never evaluated here and baked into the file as literals.
+ */
+function nnm_config_is_plain($source, &$reason)
+{
+    $allowedTokens = array(
+        T_OPEN_TAG, T_CLOSE_TAG, T_WHITESPACE, T_COMMENT, T_DOC_COMMENT,
+        T_VARIABLE, T_CONSTANT_ENCAPSED_STRING, T_LNUMBER, T_DNUMBER,
+        T_ARRAY, T_DOUBLE_ARROW, T_STRING,
+    );
+    $allowedChars = array('=', ';', ',', '(', ')', '[', ']', '.', '-', '+');
+    // "(" may open array(...) or group an expression, but never call
+    // something: after a value ($var, 'string', CONST, ")" or "]") it
+    // would be a (variable) function call such as 'phpinfo'() or $f().
+    $callableBefore = array(T_VARIABLE, T_CONSTANT_ENCAPSED_STRING, T_STRING, ')', ']');
+
+    $prev = null; // previous significant token id (int) or char
+    foreach (token_get_all($source) as $token) {
+        if (is_array($token)) {
+            list($id, $text) = $token;
+            if (!in_array($id, $allowedTokens, true)) {
+                $reason = token_name($id) . " '" . trim($text) . "'";
+                return false;
+            }
+            if ($id === T_VARIABLE && preg_match('/^\$(GLOBALS|_[A-Z]+)$/', $text)) {
+                $reason = $text;
+                return false;
+            }
+            if ($id === T_STRING && !in_array(strtolower($text), array('true', 'false', 'null'), true)
+                    && !defined($text)) {
+                $reason = "'$text'";
+                return false;
+            }
+            if (in_array($id, array(T_WHITESPACE, T_COMMENT, T_DOC_COMMENT), true)) {
+                continue;
+            }
+            $prev = $id;
+            continue;
+        }
+        if (!in_array($token, $allowedChars, true)) {
+            $reason = "'$token'";
+            return false;
+        }
+        if ($token === '(' && in_array($prev, $callableBefore, true)) {
+            $reason = 'function call';
+            return false;
+        }
+        $prev = $token;
+    }
+    return true;
 }
 
 $source = file_get_contents($configPath);

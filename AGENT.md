@@ -82,7 +82,14 @@ one-time rules (like the v1 dark→modern theme move) never re-fire.
 
 The script token-scans the config source **before executing it** and skips
 configs containing custom PHP logic (control flow, superglobals like
-`$_SERVER`, `die`/`exit`, output, includes). Never weaken this: operators run
+`$_SERVER`, `die`/`exit`, output, includes). After that denylist an
+**allowlist** pass (`nnm_config_is_plain()`) accepts only assignments of
+literals, arrays, `true`/`false`/`null`, defined constants, variables and
+`= ; , ( ) [ ] . - +`; any other token (function calls such as `getenv()`,
+backticks, `new`, `eval`, `?:`, `fn`, `match`, heredocs, `"$interpolation"`)
+marks the config as scripted. `(` directly after a value is treated as a call.
+This keeps runtime-computed values (e.g. secrets read from the environment)
+from being evaluated as root and baked into the file. Never weaken this: operators run
 hand-crafted configs with host-based switching and request guards, and
 flattening one would bake in a single branch of that logic. Scripted configs
 silence the startup notice by declaring a literal `$configVersion = N;` at the
