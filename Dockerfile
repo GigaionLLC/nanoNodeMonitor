@@ -21,6 +21,10 @@ RUN printf 'ServerTokens Prod\nServerSignature Off\n' > /etc/apache2/conf-availa
     && a2enconf zz-hardening \
     && printf 'expose_php = Off\ndisplay_errors = Off\nlog_errors = On\n' > /usr/local/etc/php/conf.d/zz-hardening.ini
 
+# upload progress tracking is unused here and is the entry point of the
+# 2026-10 PHP session upload_progress use-after-free (CVE-2026-109618/-109619)
+RUN printf 'session.upload_progress.enabled = Off\n' > /usr/local/etc/php/conf.d/zz-session.ini
+
 # copy all contents to public html
 COPY . /var/www/html
 
